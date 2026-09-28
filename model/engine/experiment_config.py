@@ -1,7 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import torch
+
+from dataset.augmentation import AugmentationConfig
 
 
 @dataclass(frozen=True)
@@ -22,6 +24,9 @@ class ExperimentConfig:
     validation_interval: int = 5
     thresholds: tuple[int, ...] = (5, 10, 20)
     device: str | None = None
+    train_augmentation: AugmentationConfig = field(
+        default_factory=AugmentationConfig
+    )
 
     def resolved_device(self) -> torch.device:
         selected_device = self.device or (

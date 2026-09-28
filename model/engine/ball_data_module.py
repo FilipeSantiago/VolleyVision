@@ -3,6 +3,7 @@ from typing import Callable
 import pandas as pd
 from torch.utils.data import DataLoader, Dataset
 
+from dataset.augmentation import AugmentationBuilder, AugmentationPipeline
 from dataset.preprocess.vballnet import VBallNet
 from dataset.volley_ball_dataset import VolleyBallDataset
 from model.engine.experiment_config import ExperimentConfig
@@ -23,6 +24,7 @@ class BallDataModule:
         self.manifest_df = pd.DataFrame()
         self._frame_tables: dict[str, pd.DataFrame] = {}
         self._datasets: dict[str, Dataset] = {}
+        self.train_augmentation: AugmentationPipeline | None = None
 
     def prepare_data(self) -> "BallDataModule":
         builder = self.manifest_builder_factory()
@@ -65,10 +67,18 @@ class BallDataModule:
             for split in self.SPLITS
         }
         self._validate_splits()
+        self.train_augmentation = AugmentationBuilder.from_config(
+            self.config.train_augmentation
+        )
         self._datasets = {
             split: self.dataset_factory(
                 frame_table,
                 sigma=self.config.sigma,
+                image_transform=(
+                    self.train_augmentation
+                    if split == "train"
+                    else None
+                ),
             )
             for split, frame_table in self._frame_tables.items()
         }
