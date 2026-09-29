@@ -227,6 +227,8 @@ class VBallNet:
 
             original_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             original_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            fps = float(cap.get(cv2.CAP_PROP_FPS))
+            source_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
             scale_x = width / original_width
             scale_y = height / original_height
@@ -274,6 +276,7 @@ class VBallNet:
 
                 rows.append({
                     "video_id": video_id,
+                    "video_path": str(Path(video_path).resolve()),
                     "frame": frame_number,
                     "frame_path": str(frame_path),
                     "visibility": visibility,
@@ -281,6 +284,10 @@ class VBallNet:
                     "y": y,
                     "width": width,
                     "height": height,
+                    "source_width": original_width,
+                    "source_height": original_height,
+                    "fps": fps,
+                    "source_frame_count": source_frame_count,
                     "split": split
                 })
 
